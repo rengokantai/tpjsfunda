@@ -17,6 +17,10 @@
 (function(){
     var pubsub =(function(){
         var subscribers = {};
+
+        function EventObject(){}
+        EventObject.prototype = {};
+        EventObject.prototype.constructor = EventObject;
         function subscribe(e,cb){
             if(!subscribers[e]){
                 var subscribeArr = [cb];
@@ -27,10 +31,15 @@
 
         }
 
-        function publish(e){
+        function publish(e,data){
+            var eventObj = new EventObject();
+            eventObj.type = event;
+            if(data){
+                eventObj.data = data;
+            }
             if(subscribers[e]){
                 subscribers[e].forEach(function(cb){
-                    cb();
+                    cb(eventObj);
                 });
             }
         }
@@ -39,9 +48,11 @@
             sub:subscribe
         };
     })();
-    pubsub.sub('some',function(){
-        console.log('some');
+    pubsub.sub('some',function(e){
+        console.log('some', e.data.custom);
     })
-    pubsub.pub('some');
+    pubsub.pub('some',{
+        custom:"custom"
+    });
 })();
 
